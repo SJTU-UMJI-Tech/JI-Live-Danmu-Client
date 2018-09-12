@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QDesktopWidget
 from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEventLoop, QTimer
 import os, time
+from urllib.request import urlopen
 import threading
 from queue import Queue
 
@@ -85,6 +86,8 @@ if __name__ == '__main__':
         loop = QEventLoop()
         QTimer.singleShot(100, loop.quit)
         loop.exec()
-        danmu_manager.add('我好菜啊')
+        message = urlopen('http://127.0.0.1:5000/get').read().decode('utf-8')
+        if message != 'Error:Empty':
+            danmu_manager.add(message)
 
-    # sys.exit(app.exec_())
+    sys.exit(app.exec_())
