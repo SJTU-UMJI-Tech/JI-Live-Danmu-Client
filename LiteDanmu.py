@@ -1,9 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QLabel, QDesktopWidget
+from PyQt5.QtWidgets import QApplication, QLabel, QDesktopWidget, QGraphicsDropShadowEffect
 from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEventLoop, QTimer
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 import os
 import time
 import re
@@ -41,6 +39,12 @@ class Danmu(QLabel):
         else:
             self.setWindowFlags(Qt.FramelessWindowHint |
                                 Qt.SubWindow | Qt.WindowStaysOnTopHint)
+
+        self.eff = QGraphicsDropShadowEffect()
+        self.eff.setBlurRadius(0)
+        self.eff.setColor(QColor("#000000"))
+        self.eff.setOffset(2, 2)
+        self.setGraphicsEffect(self.eff)
 
         self.anim = QPropertyAnimation(self, b"geometry")
         self.anim.setDuration(DISPLAY_TIME)
