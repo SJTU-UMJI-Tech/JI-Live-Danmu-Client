@@ -53,8 +53,7 @@ class DanmuManager:
         for _ in range(int(screenHeight * display_area / (FONT_SIZE + 20))):
             self.dandaos.append([])
 
-    def add(self, text, color=QColor(127, 9, 9)):
-        # print(self.dandaos)
+    def add(self, text):
         flag = True
         while flag:
             for idx, dandao in enumerate(self.dandaos):
@@ -65,13 +64,25 @@ class DanmuManager:
                     else:
                         break
                 if flag and (not dandao or time.time() - dandao[-1][1] > INVL_TIME / 1000):
-                    dandao.append(
-                        (Danmu(text, color, (FONT_SIZE + 20)*idx), time.time())
-                    )
+                    text, color = self.parse(text)
+                    if text.strip():
+                        dandao.append(
+                            (Danmu(text, color, (FONT_SIZE + 20)*idx), time.time())
+                        )
                     flag = False
             loop = QEventLoop()
             QTimer.singleShot(100, loop.quit)
             loop.exec()
+
+    def parse(self, text):
+        if len(text) > 8 and text[0] == '#' and text[7] == ' ':
+            r = int(text[1:3], 16)
+            g = int(text[3:5], 16)
+            b = int(text[5:7], 16)
+            return text[8:], QColor(r, g, b)
+        else:
+            return text, QColor(240, 240, 240)
+
 
 
 def refresh(app):
@@ -90,7 +101,7 @@ if __name__ == '__main__':
     danmu_manager.add('Hello, world!')
 
     # Test
-    for i in range(1000):
+    while True:
         loop = QEventLoop()
         QTimer.singleShot(50, loop.quit)
         loop.exec()
@@ -101,5 +112,3 @@ if __name__ == '__main__':
             loop = QEventLoop()
             QTimer.singleShot(200, loop.quit)
             loop.exec()
-
-    sys.exit(app.exec_())

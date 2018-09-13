@@ -4,6 +4,11 @@ app = Flask(__name__)
 
 q = Queue()
 
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
+
 @app.route("/")
 def hello():
     return "Hello World!"
