@@ -92,10 +92,14 @@ if __name__ == '__main__':
     # Test
     for i in range(1000):
         loop = QEventLoop()
-        QTimer.singleShot(100, loop.quit)
+        QTimer.singleShot(50, loop.quit)
         loop.exec()
         message = urlopen('http://127.0.0.1:5000/get').read().decode('utf-8')
         if message != 'Error:Empty':
             danmu_manager.add(message)
+        else:
+            loop = QEventLoop()
+            QTimer.singleShot(200, loop.quit)
+            loop.exec()
 
     sys.exit(app.exec_())
