@@ -53,7 +53,12 @@ class Danmu(QLabel):
         self.setFixedSize(self.fontMetrics().boundingRect(self.text()).width(
         ) + 10, self.fontMetrics().boundingRect(self.text()).height())
 
-    def showFlyDM(self):
+    def speed(self):
+        return (self.width() + screenWidth) / DISPLAY_TIME
+
+    def showFlyDM(self, y=None):
+        if y:
+            self.yPos = y
         self.anim.setDuration(DISPLAY_TIME)
         self.anim.setStartValue(
             QRect(screenWidth - 1, self.yPos, self.width(), self.height()))
@@ -63,7 +68,9 @@ class Danmu(QLabel):
         self.show()
         self.anim.start()
 
-    def showFixedDM(self):
+    def showFixedDM(self, y=None):
+        if y:
+            self.yPos = y
         self.anim.setDuration(DISPLAY_TIME)
         self.anim.setStartValue(
             QRect(int((screenWidth - self.width()) / 2), self.yPos, self.width(), self.height()))
@@ -110,37 +117,61 @@ class DanmuManager:
     def add(self, text):
         text, color, style = self.parse(text)
         flag = True if text else False
-        while flag:
-            if style == 'fly':
+        if style == 'fly':
+            danmu = Danmu(text, color, 1)
+            v2 = danmu.speed()
+            while flag:
                 my_dandaos = self.flyDandaos
-            elif style == 'top':
+                for idx, dandao in enumerate(my_dandaos):
+                    if flag and not dandao:
+                        dandao.append(
+                            (danmu, time.time())
+                        )
+                        dandao[-1][0].showFlyDM((FONT_SIZE + 20) * idx)
+                        flag = False
+                        break
+                    else:
+                        v1 = dandao[-1][0].speed()
+                        min_interval_time = (screenWidth + dandao[-1][0].width() - screenWidth * v1 / v2) / v1
+                        min_interval_time = max(min_interval_time, dandao[-1][0].width()/v1)
+                        if flag and time.time() - dandao[-1][1] > min_interval_time / 1000:
+                            dandao.append(
+                                (danmu, time.time())
+                            )
+                            dandao[-1][0].showFlyDM((FONT_SIZE + 20) * idx)
+                            flag = False
+                            break
+                if flag:
+                    sleep(100)
+
+        elif style == 'top':
+            while flag:
                 my_dandaos = self.topDandaos
-            else:
+                for idx, dandao in enumerate(my_dandaos):
+                    if flag and (not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000):
+                        dandao.append(
+                            (Danmu(text, color, (FONT_SIZE + 20) * idx), time.time())
+                        )
+                        dandao[-1][0].showFixedDM()
+                        flag = False
+                        break
+                if flag:
+                    sleep(100)
+
+        else:
+            while flag:
                 my_dandaos = self.btmDandaos
-            for idx, dandao in enumerate(my_dandaos):
-                if style == 'fly' and flag and (not dandao or time.time() - dandao[-1][1] > INVL_TIME / 1000):
-                    dandao.append(
-                        (Danmu(text, color, (FONT_SIZE + 20)*idx), time.time())
-                    )
-                    dandao[-1][0].showFlyDM()
-                    flag = False
-                elif style == 'top' and flag and (not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000):
-                    dandao.append(
-                        (Danmu(text, color, (FONT_SIZE + 20)*idx), time.time())
-                    )
-                    dandao[-1][0].showFixedDM()
-                    flag = False
-                elif style == 'btm' and flag and (not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000):
-                    dandao.append(
-                        (Danmu(text, color, screenHeight -
-                               (FONT_SIZE+20)*(2+idx)), time.time())
-                    )
-                    dandao[-1][0].showFixedDM()
-                    flag = False
-                if not flag:
-                    break
-            if flag:
-                sleep(100)
+                for idx, dandao in enumerate(my_dandaos):
+                    if flag and (not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000):
+                        dandao.append(
+                            (Danmu(text, color, screenHeight -
+                                   (FONT_SIZE + 20) * (2 + idx)), time.time())
+                        )
+                        dandao[-1][0].showFixedDM()
+                        flag = False
+                        break
+                if flag:
+                    sleep(100)
 
     def parse(self, text):
         textColor = QColor(240, 240, 240)

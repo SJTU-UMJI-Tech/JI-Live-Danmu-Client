@@ -14,12 +14,14 @@ if __name__ == "__main__":
                 if len(tmp) == 1:
                     tmp = '0' + tmp
                 content += tmp
-        if random.random() < 0.25:
+        if random.random() < 0.1:
             content += '#btm '
-        elif random.random() < 0.33:
+        elif random.random() < 0.11:
             content += '#top '
+        if random.random() < 0.1:
+            content += '#time'+str(random.randint(2, 10))+' '
         WORDS = ("python", "jumble", "easy", "difficult", "answer", "xylophone")
-        for i in range(random.randint(1, 10)):
+        for i in range(random.randint(1, 3)):
             content += ' '+random.choice(WORDS)
         urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}))
-        time.sleep(0.2)
+        time.sleep(0.1)
