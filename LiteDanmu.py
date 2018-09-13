@@ -2,8 +2,11 @@ import sys
 from PyQt5.QtWidgets import QApplication, QLabel, QDesktopWidget
 from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEventLoop, QTimer
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 import os
 import time
+import re
 from urllib.request import urlopen
 import threading
 from queue import Queue
@@ -14,6 +17,7 @@ DISPLAY_AREA = 0.8
 DISPLAY_TIME = 8000
 INVL_TIME = 2000
 WINDOW_ALPHA = 0.8
+MAX_STR_LEN = 30
 screenRect = None
 screenWidth = None
 screenHeight = None
@@ -22,6 +26,7 @@ screenHeight = None
 class Danmu(QLabel):
     def __init__(self, text, color, y, parent=None):
         super(Danmu, self).__init__(parent)
+        text = text[0:MAX_STR_LEN]
         self.setText(text)
         self.setFont(QFont("SimHei", FONT_SIZE, 100))
         pa = QPalette()
@@ -39,11 +44,13 @@ class Danmu(QLabel):
 
         self.anim = QPropertyAnimation(self, b"geometry")
         self.anim.setDuration(DISPLAY_TIME)
+        self.setFixedSize((FONT_SIZE + 20) * len(text),FONT_SIZE + 20)
         self.anim.setStartValue(
             QRect(screenWidth-1, y, self.width(), FONT_SIZE + 20))
         self.anim.setEndValue(
             QRect(-self.width(), y, self.width(), FONT_SIZE + 20))
-        self.showNormal()
+        
+        self.show()
         self.anim.start()
 
 
@@ -65,7 +72,8 @@ class DanmuManager:
                         break
                 if flag and (not dandao or time.time() - dandao[-1][1] > INVL_TIME / 1000):
                     text, color = self.parse(text)
-                    if text.strip():
+                    text = text.strip().replace('\n',' ')
+                    if text:
                         dandao.append(
                             (Danmu(text, color, (FONT_SIZE + 20)*idx), time.time())
                         )
@@ -75,20 +83,13 @@ class DanmuManager:
             loop.exec()
 
     def parse(self, text):
-        if len(text) > 8 and text[0] == '#' and text[7] == ' ':
+        if re.search("^\#[0-9a-fA-F]{6} +", text):
             r = int(text[1:3], 16)
             g = int(text[3:5], 16)
             b = int(text[5:7], 16)
-            return text[8:], QColor(r, g, b)
+            return re.sub("^\#[0-9a-fA-F]{6} +","",text), QColor(r, g, b)
         else:
             return text, QColor(240, 240, 240)
-
-
-
-def refresh(app):
-    while True:
-        time.sleep(1/10)
-        app.processEvents()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
