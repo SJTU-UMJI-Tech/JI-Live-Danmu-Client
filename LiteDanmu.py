@@ -15,8 +15,10 @@ DISPLAY_TIME = 8000
 INVL_TIME = 2000
 WINDOW_OPACITY = 0.8
 MAX_STR_LEN = 30
-RAINBOW_RGB_LIST = ['#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#007FFF', '#0000FF', '#8B00FF']
-RAINBOW_QRGB_LIST = [QColor(255, 0, 0), QColor(255, 165, 0), QColor(255, 255, 0), QColor(0, 255, 0), QColor(0, 127, 255), QColor(0, 0, 255), QColor(139, 0, 255)]
+RAINBOW_RGB_LIST = ['#FF0000', '#FFA500', '#FFFF00',
+                    '#00FF00', '#007FFF', '#0000FF', '#8B00FF']
+RAINBOW_QRGB_LIST = [QColor(255, 0, 0), QColor(255, 165, 0), QColor(255, 255, 0), QColor(
+    0, 255, 0), QColor(0, 127, 255), QColor(0, 0, 255), QColor(139, 0, 255)]
 screenRect = None
 screenWidth = None
 screenHeight = None
@@ -132,8 +134,10 @@ class DanmuManager:
                         break
                     else:
                         v1 = dandao[-1][0].speed()
-                        min_interval_time = (screenWidth + dandao[-1][0].width() - screenWidth * v1 / v2) / v1
-                        min_interval_time = max(min_interval_time, dandao[-1][0].width()/v1)
+                        min_interval_time = (
+                            screenWidth + dandao[-1][0].width() - screenWidth * v1 / v2) / v1
+                        min_interval_time = max(
+                            min_interval_time, dandao[-1][0].width()/v1)
                         if flag and time.time() - dandao[-1][1] > min_interval_time / 1000:
                             dandao.append(
                                 (danmu, time.time())
@@ -158,14 +162,14 @@ class DanmuManager:
                 if flag:
                     sleep(100)
 
-        else:
+        elif style == 'btm':
             while flag:
                 my_dandaos = self.btmDandaos
                 for idx, dandao in enumerate(my_dandaos):
                     if flag and (not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000):
                         dandao.append(
-                            (Danmu(text, color, screenHeight -
-                                   (FONT_SIZE + 20) * (2 + idx)), time.time())
+                            (Danmu(text, color, screenHeight - 30 -
+                                   (FONT_SIZE + 20) * (1 + idx)), time.time())
                         )
                         dandao[-1][0].showFixedDM()
                         flag = False
@@ -190,53 +194,58 @@ class DanmuManager:
             text = re.sub(r'\#btm', '', text, re.I)
         return text, textColor, style
 
-
 class Footer(QLabel):
+    CHANGE_TIMES = 20
+    RAINBOW_QRGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255), (139, 0, 255)]
     def __init__(self, text, parent=None):
         super(Footer, self).__init__(parent)
+        self.changeIdx = 0
+        self.clrIdx = 0
+        self.changeRGB = [0,0,0]
         self.setText(text)
         self.setFont(QFont('SimHei', FONT_SIZE, 100))
-        pa = QPalette()
-        pa.setColor(QPalette.Foreground, QColor(127,127,127))
-        self.setPalette(pa)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.setWindowOpacity(WINDOW_OPACITY)
         if os.name == 'nt':
-            self.setWindowFlags(Qt.FramelessWindowHint |
-                                Qt.Tool | Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint)
         else:
-            self.setWindowFlags(Qt.FramelessWindowHint |
-                                Qt.SubWindow | Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(Qt.FramelessWindowHint | Qt.SubWindow | Qt.WindowStaysOnTopHint)
+        self.setFixedSize(self.fontMetrics().boundingRect(self.text()).width() + 10, self.fontMetrics().boundingRect(self.text()).height())
+        self.setGeometry(QRect(screenWidth - self.width(), screenHeight - self.height() - 50, self.width(), self.height()))
 
+        self.setColor()
+
+        self.show()
+
+    def setShadow(self):
+        pa = QPalette()
+        pa.setColor(QPalette.Foreground, QColor(0,0,0))
+        self.setPalette(pa)
         self.eff = QGraphicsDropShadowEffect()
         self.eff.setBlurRadius(5)
         self.eff.setColor(QColor('#060606'))
         self.eff.setOffset(1.5, 1.5)
         self.setGraphicsEffect(self.eff)
 
-        self.anim = QVariantAnimation()
-        self.anim.valueChanged.connect(self.changeColor)
-        self.setFixedSize(self.fontMetrics().boundingRect(self.text()).width(
-        ) + 10, self.fontMetrics().boundingRect(self.text()).height())
-        self.setGeometry(QRect(screenWidth - self.width(), screenHeight - self.height(), self.width(), self.height()))
-        self.show()
-        self.rainbow_rgb_list_index = 0
-        self.showFixedDM()
-
-    @pyqtSlot(QVariant)
-    def changeColor(self, color):
-        palette = self.palette()
-        palette.setColor(QPalette.WindowText, color)
-        self.setPalette(palette)
-
-    def showFixedDM(self):
-        self.anim.stop()
-        self.anim.setDuration(DISPLAY_TIME)
-        self.anim.setStartValue(RAINBOW_QRGB_LIST[self.rainbow_rgb_list_index])
-        self.rainbow_rgb_list_index = 0 if self.rainbow_rgb_list_index == 6 else self.rainbow_rgb_list_index + 1
-        self.anim.setEndValue(RAINBOW_QRGB_LIST[self.rainbow_rgb_list_index])
-        self.anim.start()
+    def setColor(self):
+        if self.changeIdx < Footer.CHANGE_TIMES:
+            pa = QPalette()
+            pa.setColor(QPalette.Foreground, QColor(
+                Footer.RAINBOW_QRGB_LIST[self.clrIdx][0] + self.changeRGB[0] / Footer.CHANGE_TIMES * self.changeIdx,
+                Footer.RAINBOW_QRGB_LIST[self.clrIdx][1] + self.changeRGB[1] / Footer.CHANGE_TIMES * self.changeIdx,
+                Footer.RAINBOW_QRGB_LIST[self.clrIdx][2] + self.changeRGB[2] / Footer.CHANGE_TIMES * self.changeIdx
+            ))
+            self.setPalette(pa)
+            self.changeIdx += 1
+            self.show()
+        else:
+            self.changeIdx = 0
+            self.clrIdx = 0 if self.clrIdx == 6 else self.clrIdx + 1
+            self.getChangeRGB(Footer.RAINBOW_QRGB_LIST[self.clrIdx], Footer.RAINBOW_QRGB_LIST[(self.clrIdx + 1) % 7])
+    
+    def getChangeRGB(self, clr1, clr2):
+        self.changeRGB = [clr2[0] - clr1[0], clr2[1] - clr1[1], clr2[2] - clr1[2]]
 
 
 def sleep(ms):
@@ -255,16 +264,12 @@ if __name__ == '__main__':
     danmu_manager = DanmuManager(DISPLAY_AREA)
     danmu_manager.add('Hello, world!')
 
-    footer = Footer("zmlyh")
-    footer_last_update_time = time.time()
-
+    footerShadow = Footer("Live Danmu powered by JI-Tech (zyayoung, BoYanZh)")
+    footerShadow.setShadow()
+    footer = Footer("Live Danmu powered by JI-Tech (zyayoung, BoYanZh)")
+    
     while True:
-        # Update footer color
-        if time.time() - footer_last_update_time > DISPLAY_TIME/1000:
-            footer_last_update_time = time.time()
-            footer.showFixedDM()
-
-        sleep(50)
+        footer.setColor()
         danmu_manager.destroyDM()
         message = urlopen('http://127.0.0.1:5000/get').read().decode('utf-8')
         if message != 'Error:Empty':
@@ -273,11 +278,12 @@ if __name__ == '__main__':
                 r'\#time(\d+)', message)
             if matchObj:
                 RAINBOW_RGB_LIST_INDEX = 0
-                loopTime = max(min(20, int(matchObj.group(1))), 1)
+                loopTime = max(min(50, int(matchObj.group(1))), 1)
                 message = re.sub('\#time\d+', '', message)
                 if not re.search(r'\#[0-9a-fA-F]{6}', message):
                     for _ in range(loopTime):
-                        danmu_manager.add(RAINBOW_RGB_LIST[RAINBOW_RGB_LIST_INDEX] + message)
+                        danmu_manager.add(
+                            RAINBOW_RGB_LIST[RAINBOW_RGB_LIST_INDEX] + message)
                         RAINBOW_RGB_LIST_INDEX = 0 if RAINBOW_RGB_LIST_INDEX == 6 else RAINBOW_RGB_LIST_INDEX + 1
                 else:
                     for _ in range(loopTime):
