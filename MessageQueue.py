@@ -26,6 +26,12 @@ def get():
     else:
         return q.get()
 
+@app.route("/cls")
+def cls():
+    with q.mutex:
+        q.queue.clear()
+    return 'OK'
+
 if __name__ == "__main__":
     print('Start')
     app.run(host = '127.0.0.1', port = '5000')
