@@ -188,7 +188,7 @@ class DanmuManager:
                             flag = False
                             break
                 if flag:
-                    sleep(100)
+                    sleep(0.1)
         elif style == 'top':
             while flag:
                 my_dandaos = self.topDandaos
@@ -201,30 +201,27 @@ class DanmuManager:
                         flag = False
                         break
                 if flag:
-                    sleep(100)
+                    sleep(0.1)
         elif style == 'btm':
             while flag:
                 my_dandaos = self.btmDandaos
                 for idx, dandao in enumerate(my_dandaos):
                     if flag and (not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000 + 1):
                         dandao.append(
-                            (Danmu(text, color, screenHeight - 30 -
-                                   (FONT_SIZE + 20) * (1 + idx)), time.time())
+                            (Danmu(text, color, screenHeight - 30 - (FONT_SIZE + 20) * (1 + idx)), time.time())
                         )
                         dandao[-1][0].showFixedDM()
                         flag = False
                         break
                 if flag:
-                    sleep(100)
+                    sleep(0.1)
 
     def parse(self, text):
         textColor = QColor(240, 240, 240)
         style = 'fly'
-        match_object = re.search(
-            r'\#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})', text)
+        match_object = re.search(r'\#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})', text)
         if match_object:
-            textColor = QColor(int(match_object.group(1), 16), int(
-                match_object.group(2), 16), int(match_object.group(3), 16))
+            textColor = QColor(int(match_object.group(1), 16), int(match_object.group(2), 16), int(match_object.group(3), 16))
             text = re.sub(r'\#[0-9a-fA-F]{6}', '', text)
         if re.search(r'\#top', text, re.I):
             style = 'top'
