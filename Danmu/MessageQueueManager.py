@@ -5,10 +5,12 @@ import os
 class MessageQueueManager:
     def __init__(self, url='http://127.0.0.1:5000/'):
         self.url = url
+        urlopen(self.url)
         self.clear()
 
     def get(self):
-        return urlopen(os.path.join(self.url, 'get')).read().decode('utf-8')
+        message = urlopen(os.path.join(self.url, 'get')).read().decode('utf-8')
+        return message
 
     def clear(self):
         return urlopen(os.path.join(self.url, 'cls'))
