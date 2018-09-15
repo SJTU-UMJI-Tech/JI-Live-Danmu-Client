@@ -7,7 +7,7 @@ import time, random
 if __name__ == "__main__":
     while True:
         content = ''
-        if random.random() < 0.67:
+        if random.random() < 0.4:
             content += '#'
             for i in range(3):
                 tmp = hex(random.randint(0, 255))[2:]
@@ -18,10 +18,10 @@ if __name__ == "__main__":
             content += '#btm '
         elif random.random() < 0.11:
             content += '#top '
-        if random.random() < 0.1:
-            content += '#time'+str(random.randint(2, 10))+' '
+        if random.random() < 0.2:
+            content += '#time'+str(random.randint(2, 5))+' '
         WORDS = ("python", "jumble", "easy", "difficult", "answer", "xylophone")
         for i in range(random.randint(1, 3)):
             content += ' '+random.choice(WORDS)
         urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}))
-        time.sleep(0.01)
+        time.sleep(0.1)
