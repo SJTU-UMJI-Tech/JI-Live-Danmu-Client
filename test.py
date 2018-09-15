@@ -24,4 +24,4 @@ if __name__ == "__main__":
         for i in range(random.randint(1, 3)):
             content += ' '+random.choice(WORDS)
         urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}))
-        time.sleep(0.1)
+        time.sleep(0.01)

@@ -97,7 +97,7 @@ class Danmu(QLabel):
 
 class footerDanmu(Danmu):
     CHANGE_TIMES = 20
-    RAINBOW_QRGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255), (139, 0, 255)]
+    RAINBOW_RGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255), (139, 0, 255)]
     def __init__(self, text):
         super(footerDanmu,self).__init__(text, QColor(255, 0, 0), -1)
         self.changeIdx = 0
@@ -109,9 +109,9 @@ class footerDanmu(Danmu):
         if self.changeIdx < self.CHANGE_TIMES:
             pa = QPalette()
             pa.setColor(QPalette.Foreground, QColor(
-                self.RAINBOW_QRGB_LIST[self.clrIdx][0] + self.changeRGB[0] / self.CHANGE_TIMES * self.changeIdx,
-                self.RAINBOW_QRGB_LIST[self.clrIdx][1] + self.changeRGB[1] / self.CHANGE_TIMES * self.changeIdx,
-                self.RAINBOW_QRGB_LIST[self.clrIdx][2] + self.changeRGB[2] / self.CHANGE_TIMES * self.changeIdx
+                self.RAINBOW_RGB_LIST[self.clrIdx][0] + self.changeRGB[0] / self.CHANGE_TIMES * self.changeIdx,
+                self.RAINBOW_RGB_LIST[self.clrIdx][1] + self.changeRGB[1] / self.CHANGE_TIMES * self.changeIdx,
+                self.RAINBOW_RGB_LIST[self.clrIdx][2] + self.changeRGB[2] / self.CHANGE_TIMES * self.changeIdx
             ))
             self.setPalette(pa)
             self.changeIdx += 1
@@ -119,7 +119,7 @@ class footerDanmu(Danmu):
         else:
             self.changeIdx = 0
             self.clrIdx = 0 if self.clrIdx == 6 else self.clrIdx + 1
-            self.getChangeRGB(self.RAINBOW_QRGB_LIST[self.clrIdx], self.RAINBOW_QRGB_LIST[(self.clrIdx + 1) % 7])
+            self.getChangeRGB(self.RAINBOW_RGB_LIST[self.clrIdx], self.RAINBOW_RGB_LIST[(self.clrIdx + 1) % 7])
     
     def getChangeRGB(self, clr1, clr2):
         self.changeRGB = [clr2[0] - clr1[0], clr2[1] - clr1[1], clr2[2] - clr1[2]]
@@ -135,13 +135,14 @@ class DanmuManager:
             self.btmDandaos.append([])
 
     def destroyDM(self):
+        import sip
         timeNow = time.time()
         invlTime = DISPLAY_TIME / 1000 + 0.5
         for dandao in self.flyDandaos:
             if len(dandao) == 0:
                 continue
             if timeNow - dandao[0][1] > invlTime:
-                dandao[0][0].deleteLater()
+                sip.delete(dandao[0][0])
                 dandao.pop(0)
             else:
                 continue
@@ -149,7 +150,7 @@ class DanmuManager:
             if len(dandao) == 0:
                 continue
             if timeNow - dandao[0][1] > invlTime:
-                dandao[0][0].deleteLater()
+                sip.delete(dandao[0][0])
                 dandao.pop(0)
             else:
                 continue
@@ -157,7 +158,7 @@ class DanmuManager:
             if len(dandao) == 0:
                 continue
             if timeNow - dandao[0][1] > invlTime:
-                dandao[0][0].deleteLater()
+                sip.delete(dandao[0][0])
                 dandao.pop(0)
             else:
                 continue
@@ -237,7 +238,7 @@ class DanmuManager:
 
 class RunLabel(QFrame):
     CHANGE_TIMES = 20
-    RAINBOW_QRGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255), (139, 0, 255)]
+    RAINBOW_RGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255), (139, 0, 255)]
     def __init__(self, parent, text, color):
         super().__init__(parent)
         self.changeIdx = 0
@@ -260,7 +261,7 @@ class RunLabel(QFrame):
         self.label.anim.setLoopCount(-1)
         self.label.anim.start()
         #self.label.setStyleSheet("border:1px solid red;")
-        self.getChangeRGB(self.RAINBOW_QRGB_LIST[self.clrIdx], self.RAINBOW_QRGB_LIST[(self.clrIdx + 1) % 7])
+        self.getChangeRGB(self.RAINBOW_RGB_LIST[self.clrIdx], self.RAINBOW_RGB_LIST[(self.clrIdx + 1) % 7])
         self.label.show()
 
     def initLabel(self, label, text):
@@ -277,9 +278,9 @@ class RunLabel(QFrame):
         if self.changeIdx < self.CHANGE_TIMES:
             pa = QPalette()
             pa.setColor(QPalette.Foreground, QColor(
-                self.RAINBOW_QRGB_LIST[self.clrIdx][0] + self.changeRGB[0] / self.CHANGE_TIMES * self.changeIdx,  
-                self.RAINBOW_QRGB_LIST[self.clrIdx][1] + self.changeRGB[1] / self.CHANGE_TIMES * self.changeIdx,
-                self.RAINBOW_QRGB_LIST[self.clrIdx][2] + self.changeRGB[2] / self.CHANGE_TIMES * self.changeIdx
+                self.RAINBOW_RGB_LIST[self.clrIdx][0] + self.changeRGB[0] / self.CHANGE_TIMES * self.changeIdx,  
+                self.RAINBOW_RGB_LIST[self.clrIdx][1] + self.changeRGB[1] / self.CHANGE_TIMES * self.changeIdx,
+                self.RAINBOW_RGB_LIST[self.clrIdx][2] + self.changeRGB[2] / self.CHANGE_TIMES * self.changeIdx
             ))
             self.label.setPalette(pa)
             self.changeIdx += 1
@@ -287,7 +288,7 @@ class RunLabel(QFrame):
         else:
             self.changeIdx = 0
             self.clrIdx = 0 if self.clrIdx == 6 else self.clrIdx + 1
-            self.getChangeRGB(self.RAINBOW_QRGB_LIST[self.clrIdx], self.RAINBOW_QRGB_LIST[(self.clrIdx + 1) % 7])
+            self.getChangeRGB(self.RAINBOW_RGB_LIST[self.clrIdx], self.RAINBOW_RGB_LIST[(self.clrIdx + 1) % 7])
     
     def setShadow(self, color, blurRadius, offset):
         self.eff = QGraphicsDropShadowEffect()
@@ -325,12 +326,14 @@ if __name__ == '__main__':
     danmu_manager = DanmuManager()
     danmu_manager.add("Hello World!")
     #footer_danmu = footerDanmu(FOOTER_TEXT)
-    DMMThread = td.Thread(target=DMMTask, args=(danmu_manager,), daemon=True)
-    DMMThread.start()
+    #DMMThread = td.Thread(target=DMMTask, args=(danmu_manager,), daemon=True)
+    #DMMThread.start()
     rlbl = RunLabel(ex, FOOTER_TEXT, QColor(255, 0, 0))
     FDMThread = td.Thread(target=FDMTask, args=(rlbl,), daemon=True)
     FDMThread.start()
     while True:
+        ex.raise_()
+        danmu_manager.destroyDM()
         message = urlopen('http://127.0.0.1:5000/get').read().decode('utf-8')
         if message != 'Error:Empty':
             loopTime = 1
