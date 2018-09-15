@@ -1,6 +1,3 @@
-from PyQt5.QtWidgets import QApplication, QDesktopWidget
-
-
 MAX_STR_LEN = 30
 FONT_SIZE = 24
 WINDOW_OPACITY = 0.8

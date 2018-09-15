@@ -3,6 +3,7 @@ from PyQt5.QtGui import QColor
 from Danmu.Danmu import Danmu
 from Danmu.config import *
 
+
 class DanmuManager:
     def __init__(self, window, screenWidth, screenHeight, display_area=0.9):
         self.screenWidth = screenWidth

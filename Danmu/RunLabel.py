@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QLabel, QGraphicsDropShadowEffect, QFrame
 from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtCore import QPropertyAnimation, QRect
 
+
 class RunLabel(QFrame):
     CHANGE_TIMES = 20
     RAINBOW_RGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255),

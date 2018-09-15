@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QApplication, QLabel, QDesktopWidget, QGraphicsDropShadowEffect, QWidget, QFrame
+from PyQt5.QtWidgets import QLabel, QGraphicsDropShadowEffect
 from PyQt5.QtGui import QFont, QPalette, QColor
-from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEventLoop, QTimer
+from PyQt5.QtCore import Qt, QPropertyAnimation, QRect
 import re
 from Danmu.config import *
+
 
 class Danmu(QLabel):
     def __init__(self, text, color, top, window):
