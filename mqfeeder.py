@@ -9,6 +9,7 @@ HELP_CONTENT = 'To send normal white Danmu by just send your words.\n' + \
                'The max length of your words is 30.\n' + \
                'e.g "#top #00FF00 Life is short,use Python."'
 
+
 def onQQMessage(bot, contact, member, content):
     if '#help' in content:
         bot.SendTo(contact, HELP_CONTENT)

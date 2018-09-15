@@ -28,5 +28,5 @@ if __name__ == '__main__':
         rlbl.changeLabel()
         mq.push_all_message_to_danmu_manager(danmu_manager)
         danmu_manager.show()
-        sleep(0.1)
+        sleep(0.01)
 

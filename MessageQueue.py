@@ -13,11 +13,13 @@ log.setLevel(logging.ERROR)
 def hello():
     return "Hello World!"
 
+
 @app.route("/push")
 def push():
     message = request.args.get('message')
     q.put(message)
     return 'OK'
+
 
 @app.route("/get")
 def get():
@@ -26,12 +28,19 @@ def get():
     else:
         return q.get()
 
+
 @app.route("/cls")
 def cls():
     with q.mutex:
         q.queue.clear()
     return 'OK'
 
+
+@app.route("/qsize")
+def qsize():
+    return str(q.qsize())
+
+
 if __name__ == "__main__":
     print('Start')
-    app.run(host = '127.0.0.1', port = '5000')
+    app.run(host='127.0.0.1', port='5000')
