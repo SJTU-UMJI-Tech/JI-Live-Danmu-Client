@@ -1,15 +1,27 @@
 from urllib.request import urlopen
-import os
+import os, time
 
 
 class MessageQueueManager:
     def __init__(self, url='http://127.0.0.1:5000/'):
         self.url = url
-        urlopen(self.url)
-        self.clear()
+        for _ in range(60):
+            try:
+                urlopen(self.url)
+                self.clear()
+                return
+            except KeyError as e:
+                print(e)
+                time.sleep(1)
 
     def get(self):
-        message = urlopen(os.path.join(self.url, 'get')).read().decode('utf-8')
+        try:
+            message = urlopen(os.path.join(self.url, 'get')).read().decode('utf-8')
+            if message == 'Error:403 Forbidden':
+                urlopen(self.url)
+                message = urlopen(os.path.join(self.url, 'get')).read().decode('utf-8')
+        except:
+            message = 'Error:Empty'
         return message
 
     def clear(self):

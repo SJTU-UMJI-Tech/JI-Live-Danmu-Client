@@ -14,4 +14,7 @@ def onQQMessage(bot, contact, member, content):
     if '#help' in content:
         bot.SendTo(contact, HELP_CONTENT)
     elif not bot.isMe(contact, member):
-        urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}))
+        try:
+            urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}), timeout=1)
+        except KeyError as e:
+            print(e)
