@@ -7,3 +7,4 @@ RAINBOW_RGB_LIST = ['#FF0000', '#FFA500', '#FFFF00',
 FOOTER_TEXT = "Danmu powered by JI-Tech (tc-imba, zyayoung, BoYanZh)"
 sk = 'YourSecretKey'
 server_url = 'http://zyayoung.oicp.io:5000/'
+# server_url = 'http://127.0.0.1:5000/'

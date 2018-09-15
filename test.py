@@ -3,6 +3,7 @@
 from urllib.request import urlopen
 from urllib.parse import urlencode
 import time, random
+from Danmu.config import server_url
 
 if __name__ == "__main__":
     while True:
@@ -23,5 +24,5 @@ if __name__ == "__main__":
         WORDS = ("python", "jumble", "easy", "difficult", "answer", "xylophone")
         for i in range(random.randint(1, 3)):
             content += ' '+random.choice(WORDS)
-        urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}))
+        urlopen(server_url+'push?'+urlencode({'message': content}))
         time.sleep(0.1)
