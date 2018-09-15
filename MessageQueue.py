@@ -7,52 +7,51 @@ q = Queue()
 import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-user_ip = '127.0.0.1'
+userIP = '127.0.0.1'
 
-
+# identify user's identity
 @app.route("/")
 def hello():
-    global user_ip
-    if request.args.get('sk') == 'YourSecretKey':
-        user_ip = request.remote_addr
+    global userIP
+    if request.args.get('secretKey') == 'YourSecretKey':
+        userIP = request.remote_addr
     return "Hello World!"
 
-
+# add message to queue
 @app.route("/push")
 def push():
-    if request.remote_addr not in [user_ip, '127.0.0.1']:
+    if request.remote_addr not in [userIP, '127.0.0.1']:
         return 'Error:403 Forbidden'
     message = request.args.get('message')
     q.put(message)
     return 'OK'
 
-
+# get message to queue
 @app.route("/get")
 def get():
-    if request.remote_addr not in [user_ip, '127.0.0.1']:
+    if request.remote_addr not in [userIP, '127.0.0.1']:
         return 'Error:403 Forbidden'
     if q.empty():
         return 'Error:Empty'
     else:
         return q.get()
 
-
+# remove all messages in queue
 @app.route("/cls")
 def cls():
-    if request.remote_addr not in [user_ip, '127.0.0.1']:
+    if request.remote_addr not in [userIP, '127.0.0.1']:
         return 'Error:403 Forbidden'
     with q.mutex:
         q.queue.clear()
     return 'OK'
 
-
+# get queue length
 @app.route("/qsize")
 def qsize():
-    if request.remote_addr not in [user_ip, '127.0.0.1']:
+    if request.remote_addr not in [userIP, '127.0.0.1']:
         return 'Error:403 Forbidden'
     return str(q.qsize())
 
 
 if __name__ == "__main__":
-    print('Start')
     app.run(host='0.0.0.0', port='5000')

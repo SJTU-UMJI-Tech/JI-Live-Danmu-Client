@@ -3,8 +3,9 @@
 from urllib.request import urlopen
 from urllib.parse import urlencode
 import time, random
-from Danmu.config import server_url
+from Danmu.config import SERVER_URL
 
+#pressure test
 if __name__ == "__main__":
     while True:
         content = ''
@@ -24,5 +25,8 @@ if __name__ == "__main__":
         WORDS = ("python", "jumble", "easy", "difficult", "answer", "xylophone")
         for i in range(random.randint(1, 3)):
             content += ' '+random.choice(WORDS)
-        urlopen(server_url+'push?'+urlencode({'message': content}))
+        try:
+            urlopen(SERVER_URL+'push?'+urlencode({'message': content}))
+        except:
+            pass
         time.sleep(0.1)

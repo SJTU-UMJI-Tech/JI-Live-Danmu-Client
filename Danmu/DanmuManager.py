@@ -3,125 +3,127 @@ from PyQt5.QtGui import QColor
 from Danmu.Danmu import Danmu
 from Danmu.config import *
 
-
+# manage all Danmus
 class DanmuManager:
-    def __init__(self, window, screenWidth, screenHeight, display_area=0.9):
+    def __init__(self, window, screenWidth, screenHeight, displayArea=0.9):
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
         self.window = window
-        self.flyDandaos = []
-        self.topDandaos = []
-        self.btmDandaos = []
-        for _ in range(int(screenHeight * display_area / (FONT_SIZE + 20))):
-            self.flyDandaos.append([])
-            self.topDandaos.append([])
-            self.btmDandaos.append([])
-        self.flyQ = []
-        self.topQ = []
-        self.btmQ = []
+        self.flyTracks = []
+        self.topTracks = []
+        self.btmTracks = []
+        for _ in range(int(screenHeight * displayArea / (FONT_SIZE + 20))):
+            self.flyTracks.append([])
+            self.topTracks.append([])
+            self.btmTracks.append([])
+        self.flyDanmuQueue = []
+        self.topDanmuQueue = []
+        self.btmDanmuQueue = []
 
-    def destroyDM(self):
+    def cleanDanmu(self):
         timeNow = time.time()
         invlTime = DISPLAY_TIME / 1000 + 0.5
-        for dandao in self.flyDandaos:
-            if dandao and timeNow - dandao[0][1] > invlTime:
-                sip.delete(dandao[0][0])
-                dandao.pop(0)
-        for dandao in self.topDandaos:
-            if dandao and timeNow - dandao[0][1] > invlTime:
-                sip.delete(dandao[0][0])
-                dandao.pop(0)
-        for dandao in self.btmDandaos:
-            if dandao and timeNow - dandao[0][1] > invlTime:
-                sip.delete(dandao[0][0])
-                dandao.pop(0)
+        for track in self.flyTracks:
+            if track and timeNow - track[0][1] > invlTime:
+                sip.delete(track[0][0])
+                track.pop(0)
+        for track in self.topTracks:
+            if track and timeNow - track[0][1] > invlTime:
+                sip.delete(track[0][0])
+                track.pop(0)
+        for track in self.btmTracks:
+            if track and timeNow - track[0][1] > invlTime:
+                sip.delete(track[0][0])
+                track.pop(0)
 
-    def show(self):
-        added_successfully = True
-        while self.flyQ and added_successfully:
-            added_successfully = False
-            text, color = self.flyQ[0]
+    #put Danmu in queue on track
+    def showDanmu(self):
+        isAdded = True
+        while self.flyDanmuQueue and isAdded:
+            isAdded = False
+            text, color = self.flyDanmuQueue[0]
             danmu = Danmu(text, color, 0, self.window)
-            v2 = danmu.speed()
-            for idx, dandao in enumerate(self.flyDandaos):
-                if not dandao:
-                    dandao.append((danmu, time.time()))
-                    dandao[-1][0].showFlyDM((FONT_SIZE + 20) * idx)
-                    added_successfully = True
+            v2 = danmu.getSpeed()
+            for idx, track in enumerate(self.flyTracks):
+                if not track:
+                    track.append((danmu, time.time()))
+                    track[-1][0].showFlyDanmu((FONT_SIZE + 20) * idx)
+                    isAdded = True
                     break
                 else:
-                    v1 = dandao[-1][0].speed()
-                    min_interval_time = (
-                                                self.screenWidth + dandao[-1][0].width() - self.screenWidth * v1 / v2) / v1
-                    min_interval_time = max(
-                        min_interval_time, dandao[-1][0].width() / v1)
-                    if time.time() - dandao[-1][1] > min_interval_time / 1000:
-                        dandao.append((danmu, time.time()))
-                        dandao[-1][0].showFlyDM((FONT_SIZE + 20) * idx)
-                        added_successfully = True
+                    v1 = track[-1][0].getSpeed()
+                    minIntervalTime = (self.screenWidth + track[-1][0].width() - self.screenWidth * v1 / v2) / v1
+                    minIntervalTime = max(minIntervalTime, track[-1][0].width() / v1)
+                    if time.time() - track[-1][1] > minIntervalTime / 1000:
+                        track.append((danmu, time.time()))
+                        track[-1][0].showFlyDanmu((FONT_SIZE + 20) * idx)
+                        isAdded = True
                         break
-            if added_successfully:
-                self.flyQ.pop(0)
+            if isAdded:
+                self.flyDanmuQueue.pop(0)
             else:
                 sip.delete(danmu)
 
-        added_successfully = True
-        while self.topQ and added_successfully:
-            added_successfully = False
-            text, color = self.topQ[0]
-            for idx, dandao in enumerate(self.topDandaos):
-                if not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000 + 1:
-                    dandao.append((Danmu(text, color, (FONT_SIZE + 20) * idx, self.window), time.time()))
-                    dandao[-1][0].showFixedDM()
-                    added_successfully = True
+        isAdded = True
+        while self.topDanmuQueue and isAdded:
+            isAdded = False
+            text, color = self.topDanmuQueue[0]
+            for idx, track in enumerate(self.topTracks):
+                if not track or time.time() - track[-1][1] > DISPLAY_TIME / 1000 + 1:
+                    track.append((Danmu(text, color, (FONT_SIZE + 20) * idx, self.window), time.time()))
+                    track[-1][0].showFixedDanmu()
+                    isAdded = True
                     break
-            if added_successfully:
-                self.topQ.pop(0)
+            if isAdded:
+                self.topDanmuQueue.pop(0)
 
-        added_successfully = True
-        while self.btmQ and added_successfully:
-            added_successfully = False
-            text, color = self.btmQ[0]
-            for idx, dandao in enumerate(self.btmDandaos):
-                if not dandao or time.time() - dandao[-1][1] > DISPLAY_TIME / 1000 + 1:
-                    dandao.append((Danmu(text, color, self.screenHeight - 30 - (FONT_SIZE + 20) * (1 + idx), self.window), time.time()))
-                    dandao[-1][0].showFixedDM()
-                    added_successfully = True
+        isAdded = True
+        while self.btmDanmuQueue and isAdded:
+            isAdded = False
+            text, color = self.btmDanmuQueue[0]
+            for idx, track in enumerate(self.btmTracks):
+                if not track or time.time() - track[-1][1] > DISPLAY_TIME / 1000 + 1:
+                    track.append((Danmu(text, color, self.screenHeight - 30 - (FONT_SIZE + 20) * (1 + idx), self.window), time.time()))
+                    track[-1][0].showFixedDanmu()
+                    isAdded = True
                     break
-            if added_successfully:
-                self.btmQ.pop(0)
+            if isAdded:
+                self.btmDanmuQueue.pop(0)
 
-
-    def add(self, text):
+    # add Danmu to queue
+    def addDanmu(self, text):
         repeat = re.search(r'\#time(\d+)', text)
         if repeat:
-            repeat_count = max(min(50, int(repeat.group(1))), 1)
-            message = re.sub('\#time\d+', '', text)
+            repeatCount = max(min(MAX_REPEAT_COUNT, int(repeat.group(1))), 1)
+            message = re.sub(r'\#time\d+', '', text)
+            # rainbow Danmu for multiple times
             if not re.search(r'\#[0-9a-fA-F]{6}', message):
-                rainbow_rgb_index = 0
-                for _ in range(repeat_count):
-                    self.add(RAINBOW_RGB_LIST[rainbow_rgb_index] + message)
-                    rainbow_rgb_index = 0 if rainbow_rgb_index == 6 else rainbow_rgb_index + 1
+                rainbowRgbIndex = 0
+                for _ in range(repeatCount):
+                    self.addDanmu(RAINBOW_RGB_LIST[rainbowRgbIndex] + message)
+                    rainbowRgbIndex = 0 if rainbowRgbIndex == 6 else rainbowRgbIndex + 1
             else:
-                for _ in range(repeat_count):
-                    self.add(message)
+                for _ in range(repeatCount):
+                    self.addDanmu(message)
         else:
-            text, color, style = self.parse(text)
+            # classify Danmu
+            text, color, style = self.parseText(text)
             if text.strip() == '':
                 return
             if style == 'fly':
-                self.flyQ.append((text, color))
+                self.flyDanmuQueue.append((text, color))
             elif style == 'top':
-                self.topQ.append((text, color))
+                self.topDanmuQueue.append((text, color))
             elif style == 'btm':
-                self.btmQ.append((text, color))
+                self.btmDanmuQueue.append((text, color))
 
-    def parse(self, text):
+    # analyze special commands in text
+    def parseText(self, text):
         textColor = QColor(240, 240, 240)
         style = 'fly'
-        match_object = re.search(r'\#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})', text)
-        if match_object:
-            textColor = QColor(int(match_object.group(1), 16), int(match_object.group(2), 16), int(match_object.group(3), 16))
+        matchObject = re.search(r'\#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})', text)
+        if matchObject:
+            textColor = QColor(int(matchObject.group(1), 16), int(matchObject.group(2), 16), int(matchObject.group(3), 16))
             text = re.sub(r'\#[0-9a-fA-F]{6}', '', text)
         if re.search(r'\#top', text, re.I):
             style = 'top'
