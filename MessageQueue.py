@@ -1,4 +1,4 @@
-from flask import Flask,request
+from flask import Flask, request
 from queue import Queue
 app = Flask(__name__)
 

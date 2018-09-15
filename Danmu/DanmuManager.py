@@ -24,29 +24,17 @@ class DanmuManager:
         timeNow = time.time()
         invlTime = DISPLAY_TIME / 1000 + 0.5
         for dandao in self.flyDandaos:
-            if len(dandao) == 0:
-                continue
-            if timeNow - dandao[0][1] > invlTime:
+            if dandao and timeNow - dandao[0][1] > invlTime:
                 sip.delete(dandao[0][0])
                 dandao.pop(0)
-            else:
-                continue
         for dandao in self.topDandaos:
-            if len(dandao) == 0:
-                continue
-            if timeNow - dandao[0][1] > invlTime:
+            if dandao and timeNow - dandao[0][1] > invlTime:
                 sip.delete(dandao[0][0])
                 dandao.pop(0)
-            else:
-                continue
         for dandao in self.btmDandaos:
-            if len(dandao) == 0:
-                continue
-            if timeNow - dandao[0][1] > invlTime:
+            if dandao and timeNow - dandao[0][1] > invlTime:
                 sip.delete(dandao[0][0])
                 dandao.pop(0)
-            else:
-                continue
 
     def show(self):
         added_successfully = True
