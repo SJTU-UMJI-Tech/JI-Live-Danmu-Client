@@ -12,5 +12,3 @@ HELP_CONTENT = 'To send normal white Danmu by just send your words.\n' + \
                'The max length of your words is 30.\n' + \
                'e.g "#top #00FF00 Life is short,use Python."'
 SECRET_KEY = 'YourSecretKey'
-#SERVER_URL = 'http://zyayoung.oicp.io:5000/'
-SERVER_URL = 'http://127.0.0.1:5000/'
