@@ -12,6 +12,6 @@ def onQQMessage(bot, contact, member, content):
     # send message to queue
     elif not bot.isMe(contact, member):
         try:
-            urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}), timeout=1)
+            urlopen('http://127.0.0.1:5000/push?' + urlencode({'message': content}), timeout = 1)
         except KeyError as e:
             print(e)

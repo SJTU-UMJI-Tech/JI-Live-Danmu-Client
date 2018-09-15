@@ -1,5 +1,8 @@
 from flask import Flask, request
 from queue import Queue
+
+SECRET_KEY = 'YourSecretKey'
+
 app = Flask(__name__)
 
 q = Queue()
@@ -13,14 +16,14 @@ userIP = '127.0.0.1'
 @app.route("/")
 def hello():
     global userIP
-    if request.args.get('secretKey') == 'YourSecretKey':
+    if request.args.get('secretKey') == SECRET_KEY:
         userIP = request.remote_addr
     return "Hello World!"
 
 # add message to queue
 @app.route("/push")
 def push():
-    if request.remote_addr not in [userIP, '127.0.0.1']:
+    if request.remote_addr != '127.0.0.1':
         return 'Error:403 Forbidden'
     message = request.args.get('message')
     q.put(message)

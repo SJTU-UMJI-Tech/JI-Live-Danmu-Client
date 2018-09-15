@@ -15,7 +15,7 @@ class MessageQueueManager:
             try:
                 urlopen(self.url + '?' + urlencode({'secretKey': SECRET_KEY}))
                 self.clear()
-                t = td.Thread(target=self.pushAllMessage2Queue, args=(self.localmq, self.url), daemon=True)
+                t = td.Thread(target=self.getMessage, args=(self.localmq, self.url), daemon=True)
                 t.start()
                 return
             except KeyError as e:
@@ -24,7 +24,7 @@ class MessageQueueManager:
 
 
     @staticmethod
-    def pushAllMessage2Queue(q, url):
+    def getMessage(q, url):
         while True:
             try:
                 message = urlopen(os.path.join(url, 'get')).read().decode('utf-8')
@@ -38,7 +38,7 @@ class MessageQueueManager:
             else:
                 time.sleep(0.1)        
 
-    def pushAllMessage2DanmuManager(self, danmuManager):
+    def add2DanmuManager(self, danmuManager):
         while not self.localmq.empty():
             danmuManager.addDanmu(self.localmq.get())
 
