@@ -13,7 +13,7 @@ user_ip = '127.0.0.1'
 @app.route("/")
 def hello():
     global user_ip
-    if user_ip == '127.0.0.1':
+    if request.args.get('sk') == 'YourSecretKey':
         user_ip = request.remote_addr
     return "Hello World!"
 

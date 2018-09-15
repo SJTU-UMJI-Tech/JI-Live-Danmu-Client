@@ -1,9 +1,10 @@
 from urllib.request import urlopen
+from urllib.parse import urlencode
 import os, time
 
 
 class MessageQueueManager:
-    def __init__(self, url='http://127.0.0.1:5000/'):
+    def __init__(self, url='http://127.0.0.1:5000/?' + urlencode({'sk': 'YourSecretKey'})):
         self.url = url
         for _ in range(60):
             try:

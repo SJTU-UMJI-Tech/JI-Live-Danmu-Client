@@ -17,7 +17,7 @@ if __name__ == '__main__':
     screenHeight = screenRect.height()
     ex = App(screenWidth, screenHeight)
 
-    mq = MessageQueueManager()
+    mq = MessageQueueManager('http://zyayoung.oicp.io:5000/')
     danmu_manager = DanmuManager(ex, screenWidth, screenHeight)
     danmu_manager.add("Hello, World!")
     rlbl = RunLabel(ex, FOOTER_TEXT, QColor(255, 0, 0), screenWidth, screenHeight)
