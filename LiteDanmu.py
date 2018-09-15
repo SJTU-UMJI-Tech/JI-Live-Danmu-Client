@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys, time, re, os, threading as td
 from urllib.request import urlopen
-from PyQt5.QtWidgets import QApplication, QLabel, QDesktopWidget, QGraphicsDropShadowEffect, QWidget
+from PyQt5.QtWidgets import QApplication, QLabel, QDesktopWidget, QGraphicsDropShadowEffect, QWidget, QFrame
 from PyQt5.QtGui import QFont, QPalette, QColor, QIcon
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEventLoop, QTimer, QVariantAnimation, pyqtSlot, QVariant
 
@@ -11,6 +11,7 @@ WINDOW_OPACITY = 0.8
 DISPLAY_TIME = 8000
 RAINBOW_RGB_LIST = ['#FF0000', '#FFA500', '#FFFF00',
                     '#00FF00', '#007FFF', '#0000FF', '#8B00FF']
+FOOTER_TEXT = "Danmu powered by JI-Tech (tc-imba, zyayoung, BoYanZh)"
 screenRect = None
 screenWidth = None
 screenHeight = None
@@ -32,6 +33,7 @@ class App(QWidget):
             self.setWindowFlags(Qt.FramelessWindowHint | Qt.SubWindow | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.setWindowOpacity(WINDOW_OPACITY)
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.show()
  
@@ -40,17 +42,19 @@ class Danmu(QLabel):
         global myWindow
         super(Danmu, self).__init__(myWindow)
         self.top = top
-        text = re.sub(r'/Emoji\d+|/表情|^ | $', '', text.replace('\n', ' '))[0:MAX_STR_LEN]
+        if top != -1:
+            text = re.sub(r'/Emoji\d+|/表情|^ | $', '', text.replace('\n', ' '))[0:MAX_STR_LEN]
         self.setTextFormat(Qt.PlainText)
         self.setText(text)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        #self.setWindowFlags(Qt.FramelessWindowHint)
+        #self.setAttribute(Qt.WA_TranslucentBackground)
+        #self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.setFont(QFont('SimHei', FONT_SIZE, 100))
         myRect = self.fontMetrics().boundingRect(text)
         self.setFixedSize(myRect.width() + 20, myRect.height() + 10)
         self.setColor(color)
         self.setShadow(QColor('#060606'), 5, 1.5)
         #self.setStyleSheet("border:1px solid red;")
-        self.show()
 
     def setColor(self, color):
         pa = QPalette()
@@ -85,7 +89,6 @@ class Danmu(QLabel):
     def setFixedAnim(self, top, displayTime):
         self.anim = QPropertyAnimation(self, b'geometry')
         self.anim.setDuration(displayTime)
-        self.anim.setDuration(DISPLAY_TIME)
         self.anim.setStartValue(QRect(int((screenWidth - self.width()) / 2), top, self.width(), self.height()))
         self.anim.setEndValue(QRect(int((screenWidth - self.width()) / 2), top, self.width(), self.height()))
 
@@ -95,12 +98,13 @@ class Danmu(QLabel):
 class footerDanmu(Danmu):
     CHANGE_TIMES = 20
     RAINBOW_QRGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255), (139, 0, 255)]
-    def __init__(self, text):  # 先继承，在重构
-        super(footerDanmu,self).__init__(text, QColor(255, 0, 0), 0)
+    def __init__(self, text):
+        super(footerDanmu,self).__init__(text, QColor(255, 0, 0), -1)
         self.changeIdx = 0
         self.clrIdx = 0
         self.changeRGB = [0,0,0]
         self.setGeometry(QRect(screenWidth - self.width(), screenHeight - self.height() - 50, self.width(), self.height()))
+        
     def changeColor(self):
         if self.changeIdx < self.CHANGE_TIMES:
             pa = QPalette()
@@ -231,6 +235,70 @@ class DanmuManager:
             text = re.sub(r'\#btm', '', text, re.I)
         return text, textColor, style
 
+class RunLabel(QFrame):
+    CHANGE_TIMES = 20
+    RAINBOW_QRGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0), (0, 127, 255), (0, 0, 255), (139, 0, 255)]
+    def __init__(self, parent, text, color):
+        super().__init__(parent)
+        self.changeIdx = 0
+        self.clrIdx = 0
+        self.changeRGB = [0,0,0]
+        self.label = QLabel(self)
+        self.label.left = 0
+        self.initUi(text, color)
+
+    def initUi(self, text, color):
+        #self.setStyleSheet("border:1px solid blue;")
+        self.setFont(QFont('SimHei', 24, 100))
+        self.myRect = self.fontMetrics().boundingRect(text)
+        self.setGeometry(screenWidth - self.myRect.width() - 40, screenHeight - self.height() - 60, self.myRect.width() + 20, self.myRect.height() + 10)
+        self.initLabel(self.label, text + " " + text)
+        self.label.anim = QPropertyAnimation(self.label, b'geometry')
+        self.label.anim.setDuration(8000)
+        self.label.anim.setStartValue(QRect(0, 0, self.fontMetrics().boundingRect(text + " " + text).width() + 20, self.myRect.height() + 10))
+        self.label.anim.setEndValue(QRect(- self.width(), 0, self.fontMetrics().boundingRect(text + " " + text).width() + 20, self.myRect.height() + 10))
+        self.label.anim.setLoopCount(-1)
+        self.label.anim.start()
+        #self.label.setStyleSheet("border:1px solid red;")
+        self.getChangeRGB(self.RAINBOW_QRGB_LIST[self.clrIdx], self.RAINBOW_QRGB_LIST[(self.clrIdx + 1) % 7])
+        self.label.show()
+
+    def initLabel(self, label, text):
+        label.setText(text)
+        label.setFont(QFont('SimHei', 24, 100))
+        eff = QGraphicsDropShadowEffect()
+        eff.setColor(QColor(6,6,6))
+        eff.setBlurRadius(5)
+        eff.setOffset(1.5, 1.5)
+        label.setGraphicsEffect(eff)
+        label.setGeometry(0,0,self.fontMetrics().boundingRect(text).width() + 20, self.fontMetrics().boundingRect(text).height() + 10)
+
+    def changeLabel(self):
+        if self.changeIdx < self.CHANGE_TIMES:
+            pa = QPalette()
+            pa.setColor(QPalette.Foreground, QColor(
+                self.RAINBOW_QRGB_LIST[self.clrIdx][0] + self.changeRGB[0] / self.CHANGE_TIMES * self.changeIdx,  
+                self.RAINBOW_QRGB_LIST[self.clrIdx][1] + self.changeRGB[1] / self.CHANGE_TIMES * self.changeIdx,
+                self.RAINBOW_QRGB_LIST[self.clrIdx][2] + self.changeRGB[2] / self.CHANGE_TIMES * self.changeIdx
+            ))
+            self.label.setPalette(pa)
+            self.changeIdx += 1
+            self.show()
+        else:
+            self.changeIdx = 0
+            self.clrIdx = 0 if self.clrIdx == 6 else self.clrIdx + 1
+            self.getChangeRGB(self.RAINBOW_QRGB_LIST[self.clrIdx], self.RAINBOW_QRGB_LIST[(self.clrIdx + 1) % 7])
+    
+    def setShadow(self, color, blurRadius, offset):
+        self.eff = QGraphicsDropShadowEffect()
+        self.eff.setColor(color)
+        self.eff.setBlurRadius(blurRadius)
+        self.eff.setOffset(offset, offset)
+        self.setGraphicsEffect(self.eff)
+    
+    def getChangeRGB(self, clr1, clr2):
+        self.changeRGB = [clr2[0] - clr1[0], clr2[1] - clr1[1], clr2[2] - clr1[2]]
+
 def sleep(s):
     loop = QEventLoop()
     QTimer.singleShot(int(s * 1000), loop.quit)
@@ -243,7 +311,7 @@ def DMMTask(danmu_manager):
 
 def FDMTask(footerDM):
     while True:
-        footerDM.changeColor()
+        footerDM.changeLabel()
         time.sleep(0.1)
 
 if __name__ == '__main__':
@@ -256,10 +324,11 @@ if __name__ == '__main__':
     ex = App()
     danmu_manager = DanmuManager()
     danmu_manager.add("Hello World!")
-    footer_danmu = footerDanmu("zyatql")
+    #footer_danmu = footerDanmu(FOOTER_TEXT)
     DMMThread = td.Thread(target=DMMTask, args=(danmu_manager,), daemon=True)
     DMMThread.start()
-    FDMThread = td.Thread(target=FDMTask, args=(footer_danmu,), daemon=True)
+    rlbl = RunLabel(ex, FOOTER_TEXT, QColor(255, 0, 0))
+    FDMThread = td.Thread(target=FDMTask, args=(rlbl,), daemon=True)
     FDMThread.start()
     while True:
         message = urlopen('http://127.0.0.1:5000/get').read().decode('utf-8')
@@ -284,4 +353,5 @@ if __name__ == '__main__':
                 danmu_manager.add(message)
         else:
             sleep(0.1)
+    print("End")
     
