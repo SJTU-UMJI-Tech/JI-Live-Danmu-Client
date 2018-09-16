@@ -13,7 +13,8 @@ from Danmu.utils import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('serverUrl', type=str, nargs='?', default='http://127.0.0.1:5000/', help='server url')
+    parser.add_argument('-serverurl', type=str, default='http://127.0.0.1:5000/', help='server url')
+    parser.add_argument('-sk', type=str, default='YourSecretKey', help='secret key')
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
@@ -22,7 +23,7 @@ if __name__ == '__main__':
     screenHeight = screenRect.height()
     ex = App(screenWidth, screenHeight)
 
-    MyMessageQueueManager = MessageQueueManager(args.serverUrl)
+    MyMessageQueueManager = MessageQueueManager(args.serverurl, args.sk)
     MyDanmuManager = DanmuManager(ex, screenWidth, screenHeight)
     MyDanmuManager.addDanmu("Hello, World!")
     MyMarquee = Marquee(ex, FOOTER_TEXT, QColor(255, 0, 0), screenWidth, screenHeight)
@@ -32,7 +33,7 @@ if __name__ == '__main__':
         # loop every 100ms
         if tictoc:
             # refresh Ui
-            ex.raise_()
+            # ex.raise_()
             MyDanmuManager.cleanDanmu()
             MyMarquee.changeColor()
         else:
