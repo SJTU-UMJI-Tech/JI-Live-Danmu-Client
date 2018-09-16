@@ -1,6 +1,6 @@
 from urllib.request import urlopen
-from urllib.parse import urlencode
-import os, time
+from urllib.parse import urlencode, urljoin
+import time
 from queue import Queue
 import threading as td
 
@@ -27,10 +27,10 @@ class MessageQueueManager:
     def getMessage(q, url, secretKey):
         while True:
             try:
-                message = urlopen(os.path.join(url, 'get')).read().decode('utf-8')
+                message = urlopen(urljoin(url, 'get')).read().decode('utf-8')
                 if message == 'Error:403 Forbidden':
                     urlopen(url + '?' + urlencode({'secretKey': secretKey}))
-                    message = urlopen(os.path.join(url, 'get')).read().decode('utf-8')
+                    message = urlopen(urljoin(url, 'get')).read().decode('utf-8')
             except:
                 message = 'Error:Empty'
             if message not in ['Error:Empty', 'Error:403 Forbidden']:
@@ -44,4 +44,4 @@ class MessageQueueManager:
 
     # remove all messages in queue
     def clear(self):
-        return urlopen(os.path.join(self.url, 'cls'))
+        return urlopen(urljoin(self.url, 'cls'))
