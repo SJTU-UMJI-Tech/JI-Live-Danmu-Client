@@ -1,7 +1,10 @@
-import time, re, sip
+import time
+import re
+import sip
 from PyQt5.QtGui import QColor
 from Danmu.Danmu import Danmu
 from Danmu.config import *
+
 
 # manage all Danmus
 class DanmuManager:
@@ -36,7 +39,7 @@ class DanmuManager:
                 sip.delete(track[0][0])
                 track.pop(0)
 
-    #put Danmu in queue on track
+    # put Danmu in queue on track
     def showDanmu(self):
         isAdded = True
         while self.flyDanmuQueue and isAdded:
@@ -52,8 +55,12 @@ class DanmuManager:
                     break
                 else:
                     v1 = track[-1][0].getSpeed()
-                    minIntervalTime = (self.screenWidth + track[-1][0].width() - self.screenWidth * v1 / v2) / v1
-                    minIntervalTime = max(minIntervalTime, track[-1][0].width() / v1)
+                    minIntervalTime = (self.screenWidth +
+                                       track[-1][0].width() -
+                                       self.screenWidth *
+                                       v1 / v2) / v1
+                    minIntervalTime = max(minIntervalTime,
+                                          track[-1][0].width() / v1)
                     if time.time() - track[-1][1] > minIntervalTime / 1000:
                         track.append((danmu, time.time()))
                         track[-1][0].showFlyDanmu((FONT_SIZE + 20) * idx)
@@ -69,8 +76,10 @@ class DanmuManager:
             isAdded = False
             text, color = self.topDanmuQueue[0]
             for idx, track in enumerate(self.topTracks):
-                if not track or time.time() - track[-1][1] > DISPLAY_TIME / 1000 + 1:
-                    track.append((Danmu(text, color, (FONT_SIZE + 20) * idx, self.window), time.time()))
+                if not track or time.time(
+                ) - track[-1][1] > DISPLAY_TIME / 1000 + 1:
+                    track.append((Danmu(text, color, (FONT_SIZE + 20) * idx,
+                                        self.window), time.time()))
                     track[-1][0].showFixedDanmu()
                     isAdded = True
                     break
@@ -82,8 +91,12 @@ class DanmuManager:
             isAdded = False
             text, color = self.btmDanmuQueue[0]
             for idx, track in enumerate(self.btmTracks):
-                if not track or time.time() - track[-1][1] > DISPLAY_TIME / 1000 + 1:
-                    track.append((Danmu(text, color, self.screenHeight - 30 - (FONT_SIZE + 20) * (1 + idx), self.window), time.time()))
+                if not track or time.time(
+                ) - track[-1][1] > DISPLAY_TIME / 1000 + 1:
+                    track.append((Danmu(
+                        text, color,
+                        self.screenHeight - 30 - (FONT_SIZE + 20) * (1 + idx),
+                        self.window), time.time()))
                     track[-1][0].showFixedDanmu()
                     isAdded = True
                     break
@@ -101,7 +114,8 @@ class DanmuManager:
                 rainbowRgbIndex = 0
                 for _ in range(repeatCount):
                     self.addDanmu(RAINBOW_RGB_LIST[rainbowRgbIndex] + message)
-                    rainbowRgbIndex = 0 if rainbowRgbIndex == 6 else rainbowRgbIndex + 1
+                    rainbowRgbIndex = 0 if rainbowRgbIndex == 6 \
+                        else rainbowRgbIndex + 1
             else:
                 for _ in range(repeatCount):
                     self.addDanmu(message)
@@ -121,9 +135,12 @@ class DanmuManager:
     def parseText(self, text):
         textColor = QColor(240, 240, 240)
         style = 'fly'
-        matchObject = re.search(r'\#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})', text)
+        matchObject = re.search(
+            r'\#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})', text)
         if matchObject:
-            textColor = QColor(int(matchObject.group(1), 16), int(matchObject.group(2), 16), int(matchObject.group(3), 16))
+            textColor = QColor(
+                int(matchObject.group(1), 16), int(matchObject.group(2), 16),
+                int(matchObject.group(3), 16))
             text = re.sub(r'\#[0-9a-fA-F]{6}', '', text)
         if re.search(r'\#top', text, re.I):
             style = 'top'

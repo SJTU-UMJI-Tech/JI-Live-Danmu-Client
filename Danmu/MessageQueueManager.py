@@ -13,15 +13,19 @@ class MessageQueueManager:
         # try to create a thread to push message to queue
         for _ in range(60):
             try:
-                urlopen(self.url + '?' + urlencode({'secretKey': self.secretKey}))
+                urlopen(self.url + '?' + urlencode({
+                    'secretKey': self.secretKey
+                }))
                 self.clear()
-                t = td.Thread(target=self.getMessage, args=(self.localmq, self.url, self.secretKey), daemon=True)
+                t = td.Thread(
+                    target=self.getMessage,
+                    args=(self.localmq, self.url, self.secretKey),
+                    daemon=True)
                 t.start()
                 return
             except KeyError as e:
                 print(e)
                 time.sleep(1)
-
 
     @staticmethod
     def getMessage(q, url, secretKey):
@@ -30,13 +34,14 @@ class MessageQueueManager:
                 message = urlopen(urljoin(url, 'get')).read().decode('utf-8')
                 if message == 'Error:403 Forbidden':
                     urlopen(url + '?' + urlencode({'secretKey': secretKey}))
-                    message = urlopen(urljoin(url, 'get')).read().decode('utf-8')
+                    message = urlopen(urljoin(url,
+                                              'get')).read().decode('utf-8')
             except:
                 message = 'Error:Empty'
             if message not in ['Error:Empty', 'Error:403 Forbidden']:
                 q.put(message)
             else:
-                time.sleep(0.1)        
+                time.sleep(0.1)
 
     def add2DanmuManager(self, danmuManager):
         while not self.localmq.empty():

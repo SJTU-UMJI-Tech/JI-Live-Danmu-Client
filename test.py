@@ -2,9 +2,10 @@
 
 from urllib.request import urlopen
 from urllib.parse import urlencode
-import time, random
+import time
+import random
 
-#pressure test
+# pressure test
 if __name__ == "__main__":
     while True:
         content = ''
@@ -20,12 +21,16 @@ if __name__ == "__main__":
         elif random.random() < 0.11:
             content += '#top '
         if random.random() < 0.2:
-            content += '#time'+str(random.randint(2, 20))+' '
-        WORDS = ("python", "jumble", "easy", "difficult", "answer", "xylophone")
+            content += '#time' + str(random.randint(2, 20)) + ' '
+        WORDS = ("python", "jumble", "easy", "difficult", "answer",
+                 "xylophone")
         for i in range(random.randint(1, 3)):
-            content += ' '+random.choice(WORDS)
+            content += ' ' + random.choice(WORDS)
         try:
-            urlopen('http://127.0.0.1:5000/push?'+urlencode({'message': content}))
+            urlopen('http://127.0.0.1:5000/push?' +
+                    urlencode({
+                        'message': content
+                    }))
         except:
             pass
         time.sleep(0.1)
