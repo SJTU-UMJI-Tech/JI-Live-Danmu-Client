@@ -8,24 +8,33 @@ import threading as td
 
 class MessageQueueManager:
     def __init__(self, url, port):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect((url, port))
-        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         self.localmq = Queue()
+        self.url = url
+        self.port = port
         # try to create a thread to push message to queue
-        for _ in range(60):
+        self.Connect()
+        td.Thread(
+            target=self.getSocketMessage,
+            args=(self.localmq, url, port),
+            daemon=True
+        ).start()
+
+    def Connect(self, retry=60):
+        for _ in range(retry):
             try:
+                self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.s.connect((self.url, self.port))
+                self.s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
                 self.clear()
-                td.Thread(
-                    target=self.getSocketMessage,
-                    args=(self.localmq, url, port),
-                    daemon=True).start()
+                
+                print('\nConnected')
                 return
-            except KeyError as e:
-                print(e)
-                time.sleep(1)
+            except ConnectionRefusedError:
+                print('\rConnectionRefused, retrying(%d/%d)'%(_,retry),end='')
+                time.sleep(5)
 
     def getSocketMessage(self, q, url, port):
+        emptyMessageCountdown = 0
         while True:
             try:
                 buffer = []
@@ -42,7 +51,15 @@ class MessageQueueManager:
             except:
                 messages = 'Error:Empty'
                 pass
-            print(messages)
+            if messages == '':
+                emptyMessageCountdown += 1
+                print('Empty message %d'%emptyMessageCountdown)
+                if emptyMessageCountdown > 20:
+                    self.Connect()
+                    emptyMessageCountdown=0
+            else:
+                emptyMessageCountdown = 0
+                print(messages)
             time.sleep(0.1)
 
     def add2DanmuManager(self, danmuManager):
