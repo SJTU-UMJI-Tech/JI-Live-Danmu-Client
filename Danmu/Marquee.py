@@ -1,4 +1,6 @@
 # -*-coding:utf-8 -*-
+import math
+
 from PyQt5.QtWidgets import QLabel, QGraphicsDropShadowEffect, QFrame
 from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtCore import QPropertyAnimation, QRect
@@ -6,7 +8,7 @@ from PyQt5.QtCore import QPropertyAnimation, QRect
 
 # marquee label
 class Marquee(QFrame):
-    CHANGE_TIMES = 20
+    CHANGE_TIMES = 10
     RAINBOW_RGB_LIST = [(255, 0, 0), (255, 165, 0), (255, 255, 0), (0, 255, 0),
                         (0, 127, 255), (0, 0, 255), (139, 0, 255)]
     FIXED_WIDTH = 500
@@ -14,7 +16,7 @@ class Marquee(QFrame):
 
     def __init__(self, parent, text, color, screenWidth, screenHeight):
         super().__init__(parent)
-        self.changeIdx = 0
+        self.changeColorIdx = 0
         self.clrIdx = 0
         self.changeRGB = [0, 0, 0]
         self.label = QLabel(self)
@@ -62,22 +64,22 @@ class Marquee(QFrame):
                           self.fontMetrics().boundingRect(text).height() + 10)
 
     def changeColor(self):
-        if self.changeIdx < self.CHANGE_TIMES:
+        if self.changeColorIdx < self.CHANGE_TIMES:
             pa = QPalette()
             pa.setColor(
                 QPalette.Foreground,
                 QColor(
-                    self.RAINBOW_RGB_LIST[self.clrIdx][0] +
-                    self.changeRGB[0] / self.CHANGE_TIMES * self.changeIdx,
-                    self.RAINBOW_RGB_LIST[self.clrIdx][1] +
-                    self.changeRGB[1] / self.CHANGE_TIMES * self.changeIdx,
-                    self.RAINBOW_RGB_LIST[self.clrIdx][2] +
-                    self.changeRGB[2] / self.CHANGE_TIMES * self.changeIdx))
+                    self.RAINBOW_RGB_LIST[self.clrIdx][0] + self.changeRGB[0] /
+                    self.CHANGE_TIMES * self.changeColorIdx,
+                    self.RAINBOW_RGB_LIST[self.clrIdx][1] + self.changeRGB[1] /
+                    self.CHANGE_TIMES * self.changeColorIdx,
+                    self.RAINBOW_RGB_LIST[self.clrIdx][2] + self.changeRGB[2] /
+                    self.CHANGE_TIMES * self.changeColorIdx))
             self.label.setPalette(pa)
-            self.changeIdx += 1
+            self.changeColorIdx += 1
             self.show()
         else:
-            self.changeIdx = 0
+            self.changeColorIdx = 0
             self.clrIdx = 0 if self.clrIdx == 6 else self.clrIdx + 1
             self.setChangeRGB(self.RAINBOW_RGB_LIST[self.clrIdx],
                               self.RAINBOW_RGB_LIST[(self.clrIdx + 1) % 7])

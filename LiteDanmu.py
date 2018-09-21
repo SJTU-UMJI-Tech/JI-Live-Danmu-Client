@@ -19,13 +19,10 @@ if __name__ == '__main__':
         'serverUrl',
         type=str,
         nargs='?',
-        default='http://127.0.0.1:5000/',
+        default='127.0.0.1',
         help='server url')
     parser.add_argument(
-        '-sk',
-        type=str,
-        default='YourSecretKey',
-        help='secret key')
+        'serverPort', type=int, nargs='?', default=6000, help='server port')
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
@@ -34,11 +31,12 @@ if __name__ == '__main__':
     screenHeight = screenRect.height()
     ex = App(screenWidth, screenHeight)
 
-    MyMessageQueueManager = MessageQueueManager(args.serverUrl, args.sk)
+    MyMessageQueueManager = MessageQueueManager(args.serverUrl,
+                                                args.serverPort)
     MyDanmuManager = DanmuManager(ex, screenWidth, screenHeight)
     MyDanmuManager.addDanmu("Hello, World!")
-    MyMarquee = Marquee(ex, FOOTER_TEXT, QColor(255, 0, 0),
-                        screenWidth, screenHeight)
+    MyMarquee = Marquee(ex, FOOTER_TEXT, QColor(255, 0, 0), screenWidth,
+                        screenHeight)
 
     tictoc = True
     while True:
