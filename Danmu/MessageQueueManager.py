@@ -4,6 +4,7 @@ import time
 import socket
 from queue import Queue
 import threading as td
+import ssl
 
 
 class MessageQueueManager:
@@ -24,7 +25,7 @@ class MessageQueueManager:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.sslSock = ssl.wrap_socket(
                     self.s, ca_certs="cert.pem", cert_reqs=ssl.CERT_REQUIRED)
-                self.sslSock.connect((url, port))
+                self.sslSock.connect((self.url, self.port))
                 print('\nConnected' if i > 0 else 'Connected')
                 return
             except ConnectionRefusedError:
