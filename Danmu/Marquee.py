@@ -14,13 +14,14 @@ class Marquee(QFrame):
     FIXED_WIDTH = 500
     ANIM_TIME = 8000
 
-    def __init__(self, parent, text, color, screenWidth, screenHeight):
-        super().__init__(parent)
+    def __init__(self, window, text, color):
+        super().__init__(window)
+        self.screenWidth, self.screenHeight = window.getDisplayArea()
         self.changeColorIdx = 0
         self.clrIdx = 0
         self.changeRGB = [0, 0, 0]
         self.label = QLabel(self)
-        self.initUi(text, color, screenWidth, screenHeight)
+        self.initUi(text, color, self.screenWidth, self.screenHeight)
 
     def initUi(self, text, color, screenWidth, screenHeight):
         # self.setStyleSheet("border:1px solid blue;")

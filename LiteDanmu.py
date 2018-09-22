@@ -26,17 +26,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-    screenRect = QDesktopWidget.screenGeometry(QApplication.desktop())
-    screenWidth = screenRect.width()
-    screenHeight = screenRect.height()
-    ex = App(screenWidth, screenHeight)
+    ex = App()
 
     MyMessageQueueManager = MessageQueueManager(args.serverUrl,
                                                 args.serverPort)
-    MyDanmuManager = DanmuManager(ex, screenWidth, screenHeight)
+    MyDanmuManager = DanmuManager(ex)
     MyDanmuManager.addDanmu("Hello, World!")
-    MyMarquee = Marquee(ex, FOOTER_TEXT, QColor(255, 0, 0), screenWidth,
-                        screenHeight)
+    MyMarquee = Marquee(ex, FOOTER_TEXT, QColor(255, 0, 0))
 
     tictoc = True
     while True:

@@ -5,6 +5,7 @@ import socket
 from queue import Queue
 import threading as td
 import ssl
+import sys
 
 
 class MessageQueueManager:
@@ -23,21 +24,28 @@ class MessageQueueManager:
         for i in range(retry):
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.s.settimeout(10)
                 self.sslSock = ssl.wrap_socket(
                     self.s, ca_certs="cert.pem", cert_reqs=ssl.CERT_REQUIRED)
                 self.sslSock.connect((self.url, self.port))
+                self.sslSock.settimeout(None)
                 print('\nConnected' if i > 0 else 'Connected')
-                return
+                print(self.sslSock.getpeercert())
+                break
             except ConnectionRefusedError:
                 print(
-                    '\rConnectionRefused, retrying(%d/%d)' % (i + 1,
-                                                              retry + 1),
+                    '\rConnectionRefused,' +
+                    'retrying(%d/%d)' % (i + 1, retry + 1),
                     end='')
+                time.sleep(5)
+            except:
+                print("Unexpected error in connect:", str(sys.exc_info()))
                 time.sleep(5)
 
     def getSocketMessage(self, q, url, port):
         emptyMessageCountdown = 0
         while True:
+            messages = ''
             try:
                 buffer = []
                 while True:
@@ -49,19 +57,23 @@ class MessageQueueManager:
                         break
                 messages = b''.join(buffer).decode('utf-8')
                 for msg in messages.split('\0'):
-                    q.put(msg)
+                    if len(msg) > 0:
+                        q.put(msg)
+                        print(msg)
+            except socket.timeout:
+                print("Socket time out")
+                messages = '\0'
             except:
-                messages = 'Error:Empty'
-                pass
-            if messages == '':
+                print("Unexpected error in getSocketMessage:",
+                      str(sys.exc_info()))
+            if len(messages) == 0:
                 emptyMessageCountdown += 1
                 print('Empty message %d' % emptyMessageCountdown)
-                if emptyMessageCountdown > 20:
-                    self.Connect()
+                if emptyMessageCountdown >= 10:
+                    self.connect()
                     emptyMessageCountdown = 0
             else:
                 emptyMessageCountdown = 0
-                print(messages)
             time.sleep(0.1)
 
     def add2DanmuManager(self, danmuManager):

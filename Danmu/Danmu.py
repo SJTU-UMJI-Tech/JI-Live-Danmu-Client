@@ -10,9 +10,6 @@ from Danmu.config import *
 class Danmu(QLabel):
     def __init__(self, text, color, top, window):
         super(Danmu, self).__init__(window)
-        # clean invalid characters
-        text = re.sub(r'/Emoji\d+|/表情|^ | $', '',
-                      text.replace('\n', ' '))[0:MAX_STR_LEN]
         self.top = top
         self.setTextFormat(Qt.PlainText)
         self.setText(text)
