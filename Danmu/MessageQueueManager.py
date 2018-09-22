@@ -12,25 +12,26 @@ class MessageQueueManager:
         self.url = url
         self.port = port
         # try to create a thread to push message to queue
-        self.Connect()
+        self.connect()
         td.Thread(
             target=self.getSocketMessage,
             args=(self.localmq, url, port),
-            daemon=True
-        ).start()
+            daemon=True).start()
 
-    def Connect(self, retry=60):
-        for _ in range(retry):
+    def connect(self, retry=60):
+        for i in range(retry):
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.s.connect((self.url, self.port))
-                self.s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-                self.clear()
-                
-                print('\nConnected')
+                self.sslSock = ssl.wrap_socket(
+                    self.s, ca_certs="cert.pem", cert_reqs=ssl.CERT_REQUIRED)
+                self.sslSock.connect((url, port))
+                print('\nConnected' if i > 0 else 'Connected')
                 return
             except ConnectionRefusedError:
-                print('\rConnectionRefused, retrying(%d/%d)'%(_,retry),end='')
+                print(
+                    '\rConnectionRefused, retrying(%d/%d)' % (i + 1,
+                                                              retry + 1),
+                    end='')
                 time.sleep(5)
 
     def getSocketMessage(self, q, url, port):
@@ -40,23 +41,23 @@ class MessageQueueManager:
                 buffer = []
                 while True:
                     # receive 1024 byte in maximum
-                    d = self.s.recv(1024)
+                    d = self.sslSock.recv(1024)
                     if d:
                         buffer.append(d)
                     if len(d) < 1024:
                         break
                 messages = b''.join(buffer).decode('utf-8')
-                for msg in messages.split('\r\n'):
+                for msg in messages.split('\0'):
                     q.put(msg)
             except:
                 messages = 'Error:Empty'
                 pass
             if messages == '':
                 emptyMessageCountdown += 1
-                print('Empty message %d'%emptyMessageCountdown)
+                print('Empty message %d' % emptyMessageCountdown)
                 if emptyMessageCountdown > 20:
                     self.Connect()
-                    emptyMessageCountdown=0
+                    emptyMessageCountdown = 0
             else:
                 emptyMessageCountdown = 0
                 print(messages)
@@ -65,7 +66,3 @@ class MessageQueueManager:
     def add2DanmuManager(self, danmuManager):
         while not self.localmq.empty():
             danmuManager.addDanmu(self.localmq.get())
-
-    # remove all messages in queue
-    def clear(self):
-        pass
