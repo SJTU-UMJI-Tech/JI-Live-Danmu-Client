@@ -4,7 +4,7 @@
 
 ```bash
 cp <cert_filepath> .
-LiteDanmu.py [-h] [-serverurl SERVERURL] [-sk SecretKey]
+LiteDanmu.py [-h] [-serverurl SERVERURL]
 ```
 
 ## Build:
@@ -20,5 +20,5 @@ mv dist/LiteDanmu/PyQt5/Qt/plugins/platforms/ dist/LiteDanmu
 ```
 3. Run
 ```bash
-dist/LiteDanmu/LiteDanmu.exe [-h] [-serverurl SERVERURL] [-sk SecretKey]
+dist/LiteDanmu/LiteDanmu.exe [-h] [-serverurl SERVERURL]
 ```
