@@ -2,12 +2,8 @@
 
 ## Usage:
 
-1. Set secret key in Danmu/config.py
 ```bash
-vim Danmu/config.py
-```
-2. Run Live Danmu(Optional:Set server url)
-```bash
+cp <cert_filepath> .
 LiteDanmu.py [-h] [-serverurl SERVERURL] [-sk SecretKey]
 ```
 
