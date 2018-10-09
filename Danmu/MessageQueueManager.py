@@ -20,8 +20,8 @@ class MessageQueueManager:
             args=(self.localmq, url, port),
             daemon=True).start()
 
-    def connect(self, retry=180):
-        for i in range(retry):
+    def connect(self):
+        while True:
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.s.settimeout(10)
@@ -34,9 +34,7 @@ class MessageQueueManager:
                 break
             except ConnectionRefusedError:
                 print(
-                    '\rConnectionRefused,' +
-                    'retrying(%d/%d)' % (i + 1, retry),
-                    end='')
+                    '\rConnectionRefused,' + 'retrying(%d)' % (i + 1), end='')
                 time.sleep(5)
             except:
                 print("Unexpected error in connect:", str(sys.exc_info()))
