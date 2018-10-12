@@ -21,7 +21,7 @@ class MessageQueueManager:
             daemon=True).start()
 
     def connect(self):
-        while True:
+        for i in range(65535):
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.s.settimeout(10)
