@@ -10,7 +10,7 @@ from Danmu.config import *
 class DanmuManager:
     def __init__(self, window, displayArea=0.9):
         self.window = window
-        self.width, self.height = self.window.getDisplayArea()
+        self.width, self.height = window.getDisplayArea()
         self.flyTracks = []
         self.topTracks = []
         self.btmTracks = []
@@ -92,7 +92,7 @@ class DanmuManager:
                 ) - track[-1][1] > DISPLAY_TIME / 1000 + 1:
                     track.append((Danmu(
                         text, color,
-                        self.height - 30 - (FONT_SIZE + 20) * (1 + idx),
+                        self.height - (FONT_SIZE + 20) * (1 + idx),
                         self.window), time.time()))
                     track[-1][0].showFixedDanmu()
                     isAdded = True

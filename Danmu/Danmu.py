@@ -13,8 +13,8 @@ class Danmu(QLabel):
         self.top = top
         self.setTextFormat(Qt.PlainText)
         self.setText(text)
-        # self.setWindowFlags(Qt.FramelessWindowHint)
-        # self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.setFont(QFont('SimHei', FONT_SIZE, 100))
         # set size of label

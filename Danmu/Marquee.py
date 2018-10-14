@@ -3,7 +3,7 @@ import math
 
 from PyQt5.QtWidgets import QLabel, QGraphicsDropShadowEffect, QFrame
 from PyQt5.QtGui import QFont, QPalette, QColor
-from PyQt5.QtCore import QPropertyAnimation, QRect
+from PyQt5.QtCore import QPropertyAnimation, QRect, Qt
 
 
 # marquee label
@@ -25,11 +25,12 @@ class Marquee(QFrame):
 
     def initUi(self, text, color, screenWidth, screenHeight):
         # self.setStyleSheet("border:1px solid blue;")
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.doubleText = text + " " + text
         self.setFont(QFont('SimHei', 24, 100))
         self.myRect = self.fontMetrics().boundingRect(text)
         self.setGeometry(screenWidth - self.FIXED_WIDTH - 40,
-                         screenHeight - self.height() - 60,
+                         screenHeight - self.myRect.height() - 10,
                          self.FIXED_WIDTH + 20,
                          self.myRect.height() + 10)
         self.initLabel(self.label, self.doubleText)
@@ -53,6 +54,7 @@ class Marquee(QFrame):
         self.label.show()
 
     def initLabel(self, label, text):
+        label.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         label.setText(text)
         label.setFont(QFont('SimHei', 24, 100))
         eff = QGraphicsDropShadowEffect()
@@ -96,3 +98,9 @@ class Marquee(QFrame):
         self.changeRGB = [
             clr2[0] - clr1[0], clr2[1] - clr1[1], clr2[2] - clr1[2]
         ]
+
+    def hideLabel(self):
+        self.label.hide()
+
+    def showLabel(self):
+        self.label.show()

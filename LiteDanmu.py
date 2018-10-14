@@ -5,6 +5,7 @@ import os
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QApplication, QDesktopWidget
+from PyQt5.QtCore import Qt
 
 from Danmu.App import App
 from Danmu.config import *
@@ -26,8 +27,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-    ex = App()
-
+    MymainWindow = App()
     MyMessageQueueManager = MessageQueueManager(args.serverUrl,
                                                 args.serverPort)
     MyDanmuManager = DanmuManager(ex)
@@ -40,12 +40,12 @@ if __name__ == '__main__':
         if tictoc:
             # refresh Ui
             if os.name == 'nt':
-                ex.raise_()
+                MymainWindow.raise_()
             MyDanmuManager.cleanDanmu()
             MyMarquee.changeColor()
         else:
             # get new message
-            MyMessageQueueManager.add2DanmuManager(MyDanmuManager)
-            MyDanmuManager.showDanmu()
+            MyMessageQueueManager.classifyDanmu(MymainWindow, MyDanmuManager,
+                                                MyMarquee)
         tictoc = not tictoc
         sleep(0.1)

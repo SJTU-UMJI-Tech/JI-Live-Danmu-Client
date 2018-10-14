@@ -6,6 +6,7 @@ from queue import Queue
 import threading as td
 import ssl
 import sys
+import re
 
 
 class MessageQueueManager:
@@ -74,6 +75,14 @@ class MessageQueueManager:
                 emptyMessageCountdown = 0
             time.sleep(0.1)
 
-    def add2DanmuManager(self, danmuManager):
+    def classifyDanmu(self, mainWindow, danmuManager, marquee):
         while not self.localmq.empty():
-            danmuManager.addDanmu(self.localmq.get())
+            newDanmu = self.localmq.get()
+            if re.search(r"#system ", newDanmu, re.I):
+                if re.search(r"marquee hide", newDanmu, re.I):
+                    marquee.hideLabel()
+                elif re.search(r"marquee show", newDanmu, re.I):
+                    marquee.showLabel()
+            else:
+                danmuManager.addDanmu(newDanmu)
+        danmuManager.showDanmu()
