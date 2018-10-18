@@ -27,12 +27,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-    MymainWindow = App()
+    MyMainWindow = App()
     MyMessageQueueManager = MessageQueueManager(args.serverUrl,
                                                 args.serverPort)
-    MyDanmuManager = DanmuManager(ex)
+    MyDanmuManager = DanmuManager(MyMainWindow)
     MyDanmuManager.addDanmu("Hello, World!")
-    MyMarquee = Marquee(ex, FOOTER_TEXT, QColor(255, 0, 0))
+    MyMarquee = Marquee(MyMainWindow, FOOTER_TEXT, QColor(255, 0, 0))
 
     tictoc = True
     while True:
@@ -40,12 +40,12 @@ if __name__ == '__main__':
         if tictoc:
             # refresh Ui
             if os.name == 'nt':
-                MymainWindow.raise_()
+                MyMainWindow.raise_()
             MyDanmuManager.cleanDanmu()
             MyMarquee.changeColor()
         else:
             # get new message
-            MyMessageQueueManager.classifyDanmu(MymainWindow, MyDanmuManager,
+            MyMessageQueueManager.classifyDanmu(MyMainWindow, MyDanmuManager,
                                                 MyMarquee)
         tictoc = not tictoc
         sleep(0.1)
