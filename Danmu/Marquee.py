@@ -26,7 +26,8 @@ class Marquee(QFrame):
     def initUi(self, text, color, screenWidth, screenHeight):
         # self.setStyleSheet("border:1px solid blue;")
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.doubleText = text + " " + text
+        # self.doubleText = text + " " + text
+        self.doubleText = text
         self.setFont(QFont('SimHei', 24, 100))
         self.myRect = self.fontMetrics().boundingRect(text)
         self.setGeometry(screenWidth - self.FIXED_WIDTH - 40,
@@ -38,12 +39,12 @@ class Marquee(QFrame):
         self.label.anim.setDuration(self.ANIM_TIME)
         self.label.anim.setStartValue(
             QRect(
-                0, 0,
+                self.fontMetrics().boundingRect(self.doubleText).width() + 10, 0,
                 self.fontMetrics().boundingRect(self.doubleText).width() + 20,
                 self.myRect.height() + 10))
         self.label.anim.setEndValue(
             QRect(
-                -(self.myRect.width() + 20), 0,
+                -(self.fontMetrics().boundingRect(self.doubleText).width() + 10), 0,
                 self.fontMetrics().boundingRect(self.doubleText).width() + 20,
                 self.myRect.height() + 10))
         self.label.anim.setLoopCount(-1)
